@@ -19,6 +19,8 @@ const client = new Client({
   ],
 });
 client.on("messageCreate",async (msg)=>{
-  msg.author.bot
-    msg.channel.send()
+  if(msg.author.id != process.env.admin) return;
+  await msg.delete();
+  msg.edit({embeds})
+
 })

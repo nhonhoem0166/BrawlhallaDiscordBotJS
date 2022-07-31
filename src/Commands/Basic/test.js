@@ -2,10 +2,10 @@ const {BrawlAPI} = require("../../BrawlAPI.js");
 
 module.exports = {
     data: {
-      name: "test",
+      name: "t",
     },
-    async execute(message, client) {
-        BrawlAPI.GetLeaderBoard(1);
+    async execute(msg, client) {
+       var  test =  await BrawlAPI.GetLeaderBoard("1v1","sea",1);
     }
   };
   

@@ -1,26 +1,23 @@
-const https = require("https");
+const axios = require("axios");
 require("dotenv").config();
 class BrawlAPI {
-  static backetList = ['1v1',"2v2"];
-  static regionList = ['us-e', 'eu', 'sea', 'brz', 'aus', 'us-w','jpn'];
-
+  static backetList = ["1v1", "2v2"];
+  static regionList = ["us-e", "eu", "sea", "brz", "aus", "us-w", "jpn"];
+  static dataLegends = [];
   static async GetLeaderBoard(backet, region, page) {
-    if(!this.backetList.includes(backet))
-    {
+    if (!this.backetList.includes(backet)) {
       console.log(`Backet ${backet} not found`);
-      return false
+      return false;
     }
-    if(!this.regionList.includes(region))
-    {
+    if (!this.regionList.includes(region)) {
       console.log(`Region ${region} not found`);
-      return false
+      return false;
     }
-    if(page <= 0)
-    {
+    if (page <= 0) {
       console.log("Page must be greater than 0");
       return false;
-    } 
-    return this.DownloadData(`rankings/${backet}/${region}/${page}`);
+    }
+    return await this.DownloadData(`rankings/${backet}/${region}/${page}`);
   }
   static async GetBHIDFromName(name) {
     var dataArr = this.GetPlayerByName(name);
@@ -32,26 +29,26 @@ class BrawlAPI {
     return dataArr[0].brawlhalla_id;
   }
   static async GetClanByID(clan_id) {
-    return this.DownloadData(`clan/${clan_id}`);
+    return await this.DownloadData(`clan/${clan_id}`);
   }
   static async GetPlayerStatsByID(brawlhalla_id) {
-    return this.DownloadData(`player/${brawlhalla_id}/stats`);
+    return await this.DownloadData(`player/${brawlhalla_id}/stats`);
   }
   static async GetStatsByName(name) {
     var player = this.GetBHIDFromName(name);
     if (player) return this.GetPlayerStatsByID(player.brawlhalla_id);
   }
   static async GetPlayerRankedByID(brawlhalla_id) {
-    return this.DownloadData(`player/${brawlhalla_id}/ranked`);
+    return await this.DownloadData(`player/${brawlhalla_id}/ranked`);
   }
   static async GetPlayersByName(name) {
-    return this.DownloadData(`rankings/1v1/all/1&name=${name}`);
+    return await this.DownloadData(`rankings/1v1/all/1&name=${name}`);
   }
   static async GetAllLegend() {
-    return this.DownloadData(`legend/all`);
+    return await this.DownloadData(`legend/all`);
   }
   static async GetLegendInfo(legend_id) {
-    return this.DownloadData(`legend/${legend_id}`);
+    return await this.DownloadData(`legend/${legend_id}`);
   }
   static async gloryFromWins(totalwins) {
     if (totalwins <= 150) return 20 * totalwins;
@@ -92,26 +89,19 @@ class BrawlAPI {
   }
 
   static async DownloadData(uri) {
+    console.log(uri);
     uri += `&api_key=${process.env.BrawlAPIKey}`;
     var uriFormat = `https://api.brawlhalla.com/${uri}`;
-    console.log(uriFormat);
-    var data = "";
-    https
-      .get(uriFormat, (res) => {
-        res.on("data", (chunk) => {
-          data += chunk;
-        });
+    
 
-        res.on("end", () => {
-          var response = JSON.parse(data);
-          console.log("Got a response: ", response);
-          return response;
-        });
-      })
-      .on("error", function (e) {
-        console.log("Got an error: ", e);
-        return false;
-      });
+    try {
+      //auto parse json to object
+      const response = await axios(uriFormat);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
 }
 module.exports = {
