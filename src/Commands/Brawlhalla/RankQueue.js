@@ -147,9 +147,15 @@ module.exports = {
         console.log("Đang xử lý dữ liệu");
         for (const newPlayer of newQueueList) {
           newPlayer.lastUpdate = new Date();
-          var oldPlayerIndex = boardQueue.find(
-            (x) => x.brawlhalla_id == playerNew.brawlhalla_id
-          );
+          //fix check
+          var oldPlayerIndex = false;
+          if(boardQueue.length > 0)
+          {
+            oldPlayerIndex = boardQueue.find(
+              (x) => x.brawlhalla_id == newPlayer.brawlhalla_id
+            );
+          }
+          
           if (oldPlayerIndex) {
             boardQueue[oldPlayerIndex] = newPlayer;
           } else {
