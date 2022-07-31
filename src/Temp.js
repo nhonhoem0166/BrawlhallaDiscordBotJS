@@ -19,5 +19,6 @@ const client = new Client({
   ],
 });
 client.on("messageCreate",async (msg)=>{
+  msg.author.bot
     msg.channel.send()
 })
