@@ -1,7 +1,12 @@
 const { BrawlAPI } = require("../../BrawlAPI.js");
 const { EmbedBuilder } = require("discord.js");
+
 var boardQueue = [];
 var messageBoardRanks = [];
+var timeDelay = 4 * (60 * 1000);
+var timeRemove = 30;
+var maxPage = 20;
+
 function GetMinuteBySubDate(firstDate, secondDate) {
   return Math.abs(firstDate - secondDate) / (1000 * 60);
 }
@@ -90,14 +95,13 @@ function GetPlayerFormat(player) {
 }
 
 async function UpdateEmbedsQueue(queueEmbeds, channel) {
-  if(queueEmbeds.length == 0)
-  {
+  if (queueEmbeds.length == 0) {
     var builder = new EmbedBuilder();
-      builder.setTitle("Brawlhalla SEA 1v1 Queue");
-      builder.setDescription(
-        `Hiển thị những người chơi trong top 1000 SEA đánh rank 1v1 trong ${timeRemove} phút gần đây **Giờ này không có ma nào chơi lun -.-**`
-      );
-      queueEmbeds.push(builder);
+    builder.setTitle("Brawlhalla SEA 1v1 Queue");
+    builder.setDescription(
+      `Hiển thị những người chơi trong top 1000 SEA đánh rank 1v1 trong ${timeRemove} phút gần đây **Giờ này không có ma nào chơi lun -.-**`
+    );
+    queueEmbeds.push(builder);
   }
   var i = 0;
   for (; i < queueEmbeds.length; i++) {
@@ -127,9 +131,7 @@ module.exports = {
   async execute(msg, client) {
     if (msg.author.id != process.env.admin) return;
     await msg.delete();
-    var timeDelay = 4 * (60 * 1000);
-    var timeRemove = 1;
-    var maxPage = 1;
+
     var oldRank = [];
 
     while (true) {
@@ -222,7 +224,7 @@ module.exports = {
       await UpdateEmbedsQueue(embeds, msg.channel);
 
       console.log("sleeping");
-      //await Sleep(timeDelay);
+      await Sleep(timeDelay);
     }
   },
 };
