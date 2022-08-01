@@ -162,6 +162,7 @@ module.exports = {
             boardQueue.push(newPlayer);
           }
         }
+      }
         boardQueue.filter(
           (x) => GetMinuteBySubDate(new Date(), x.lastUpdate).toFixed(0) < timeRemove
         );
@@ -200,7 +201,7 @@ module.exports = {
           }
         }
         await UpdateEmbedsQueue(embeds, msg.channel);
-      }
+      
       console.log("sleeping");
       await Sleep(timeDelay);
     }
