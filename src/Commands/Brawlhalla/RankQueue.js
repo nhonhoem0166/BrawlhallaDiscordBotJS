@@ -56,7 +56,7 @@ function GetPlayerFormat(player) {
         : `*(${
             player.rankChange > 0
               ? `:small_red_triangle_down:${player.rankChange}`
-              : `<:arrowup:931146550674083861>${Math.Abs(player.rankChange)}`
+              : `<:arrowup:931146550674083861>${Math.abs(player.rankChange)}`
           })*`
     } [**Xem**](${"http://corehalla.com/stats/player/" + player.brawlhalla_id})`
   );

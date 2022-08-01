@@ -9,8 +9,12 @@ class BrawlAPI {
   }
   static async UpdateStaticData()
   {
+    console.log("UpdateStaticData");
     this.dataLegends = await this.GetAllLegend();
-    console.log(this.dataLegends);
+    if(this.dataLegends.length > 0)
+    {
+      console.log("update dataLegends complete");
+    }
   }
   static async GetLeaderBoard(backet, region, page) {
     if (!this.backetList.includes(backet)) {
