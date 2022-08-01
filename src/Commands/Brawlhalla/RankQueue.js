@@ -163,7 +163,7 @@ module.exports = {
           }
         }
         boardQueue.filter(
-          (x) => GetMinuteBySubDate(new Date(), x.lastUpdate) > timeRemove
+          (x) => GetMinuteBySubDate(new Date(), x.lastUpdate).toFixed(0) < timeRemove
         );
         boardQueue.sort((a, b) => {
           return a - b;
