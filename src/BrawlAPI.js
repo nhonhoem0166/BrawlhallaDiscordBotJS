@@ -5,14 +5,12 @@ class BrawlAPI {
   static regionList = ["us-e", "eu", "sea", "brz", "aus", "us-w", "jpn"];
   static dataLegends = [];
   static async Init() {
-     await this.UpdateStaticData();
+    await this.UpdateStaticData();
   }
-  static async UpdateStaticData()
-  {
+  static async UpdateStaticData() {
     console.log("UpdateStaticData");
     this.dataLegends = await this.GetAllLegend();
-    if(this.dataLegends.length > 0)
-    {
+    if (this.dataLegends.length > 0) {
       console.log("update dataLegends complete");
     }
   }
@@ -44,7 +42,9 @@ class BrawlAPI {
     return await this.DownloadData(`clan/${clan_id}`);
   }
   static async GetPlayerStatsByID(brawlhalla_id) {
-    return await this.DownloadData(`player/${brawlhalla_id}/stats`);
+    var data = await this.DownloadData(`player/${brawlhalla_id}/stats`);
+    console.log(data.name);
+    return data;
   }
   static async GetStatsByName(name) {
     var player = this.GetBHIDFromName(name);
@@ -106,15 +106,22 @@ class BrawlAPI {
 
     return elo;
   }
-
   static async DownloadData(uri) {
     console.log(uri);
     uri += `&api_key=${process.env.BrawlAPIKey}`;
-    var uriFormat = `https://api.brawlhalla.com/${uri}`;
+    var urlFormat = `https://api.brawlhalla.com/${uri}`;
 
     try {
       //auto parse json to object
-      const response = await axios(uriFormat);
+      const response = await axios.get(urlFormat, {
+        transformResponse: (data) => {
+          var jsonClean = decodeURIComponent(escape(data));
+          data = JSON.parse(jsonClean);
+          return data;
+        },
+        responseType: "json",
+      });
+
       return response.data;
     } catch (error) {
       console.log(error);
