@@ -168,11 +168,11 @@ module.exports = {
           }
         }
       
-      boardQueue = boardQueue.filter(
+      this.boardQueue = boardQueue.filter(
         (x) =>
           GetMinuteBySubDate(new Date(), x.lastUpdate).toFixed(0) < timeRemove
       );
-      boardQueue = boardQueue.sort((a, b) => {
+      this.boardQueue = boardQueue.sort((a, b) => {
         return a.rank - b.rank;
       });
       Debug("Đang thêm thông tin người chơi vào Board");
