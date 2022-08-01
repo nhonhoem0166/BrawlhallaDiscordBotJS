@@ -84,10 +84,10 @@ function GetPlayerFormat(player) {
   );
 
   stringBuiler.push(
-    `Best legend: **${BrawlAPI.GetLegendName(player.best_legend)}**`
+    `Tướng tủ: **${BrawlAPI.GetLegendName(player.best_legend)}**`
   );
   stringBuiler.push(
-    `Cập nhật **${GetMinuteBySubDate(new Date(), player.lastUpdate).toFixed(
+    `Chơi **${GetMinuteBySubDate(new Date(), player.lastUpdate).toFixed(
       0
     )} phút trước**`
   );
@@ -203,7 +203,7 @@ module.exports = {
           name:
             GetEmojiRank(player.rating) +
             (player.ratingChange == 0
-              ? ""
+              ? "🟢"
               : `*${player.ratingChange < 0 ? `🔴` : `🟢`}*`) +
             Truncate(player.name, 13),
           value: GetPlayerFormat(player),
