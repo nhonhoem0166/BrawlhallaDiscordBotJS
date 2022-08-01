@@ -207,7 +207,11 @@ module.exports = {
         }
       }
     }
+    try{
       await UpdateEmbedsQueue(embeds, msg.channel);
+    }
+    catch{}
+      
 
       console.log("sleeping");
       await Sleep(timeDelay);
