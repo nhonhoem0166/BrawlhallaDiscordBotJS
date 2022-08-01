@@ -97,6 +97,7 @@ async function UpdateEmbedsQueue(queueEmbeds, channel) {
       builder.setDescription(
         `Hiển thị những người chơi trong top 1000 SEA đánh rank 1v1 trong ${timeRemove} phút gần đây **Giờ này không có ma nào chơi lun -.-**`
       );
+      queueEmbeds.push(builder);
   }
   var i = 0;
   for (; i < queueEmbeds.length; i++) {
