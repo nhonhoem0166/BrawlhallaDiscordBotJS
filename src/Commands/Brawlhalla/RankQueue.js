@@ -55,8 +55,8 @@ function GetPlayerFormat(player) {
         ? ""
         : `*(${
             player.rankChange > 0
-              ? `:small_red_triangle_down:${player.rankChange}`
-              : `<:arrowup:931146550674083861>${Math.abs(player.rankChange)}`
+              ? `🔴${player.rankChange}`
+              : `🟢${Math.abs(player.rankChange)}`
           })*`
     } [**Xem**](${"http://corehalla.com/stats/player/" + player.brawlhalla_id})`
   );
@@ -167,51 +167,50 @@ module.exports = {
             boardQueue.push(newPlayer);
           }
         }
-      
-      this.boardQueue = boardQueue.filter(
-        (x) =>
-          GetMinuteBySubDate(new Date(), x.lastUpdate).toFixed(0) < timeRemove
-      );
-      this.boardQueue = boardQueue.sort((a, b) => {
-        return a.rank - b.rank;
-      });
-      Debug("Đang thêm thông tin người chơi vào Board");
 
-      var countLimit = 0;
-      var embeds = [];
-
-      var builder = new EmbedBuilder();
-      builder.setTitle("Brawlhalla SEA 1v1 Queue");
-      builder.setDescription(
-        `Hiển thị những người chơi trong top 1000 SEA đánh rank 1v1 trong ${timeRemove} phút gần đây hiện tại có ${boardQueue.length} người`
-      );
-      console.log(`Người chơi đang rank ${boardQueue.length}`);
-
-      for (var i = 0; i < boardQueue.length; i++) {
-        Debug(`Field ${i}`);
-        var player = boardQueue[i];
-        builder.addFields({
-          name: GetEmojiRank(player.rating) + Truncate(player.name, 13),
-          value: GetPlayerFormat(player),
-          inline: true,
+        this.boardQueue = this.boardQueue.filter((x) => {
+          return (
+            GetMinuteBySubDate(new Date(), x.lastUpdate).toFixed(0) < timeRemove
+          );
         });
-        countLimit++;
-        if (countLimit == 18 || i == boardQueue.length - 1) {
-          Debug("Add builders");
-          builder.setTimestamp();
-          Debug("Add builders 1");
-          embeds.push(builder);
-          Debug("Add builder 2");
-          builder = new EmbedBuilder();
-          countLimit = 0;
+        this.boardQueue = boardQueue.sort((a, b) => {
+          return a.rank - b.rank;
+        });
+        Debug("Đang thêm thông tin người chơi vào Board");
+
+        var countLimit = 0;
+        var embeds = [];
+
+        var builder = new EmbedBuilder();
+        builder.setTitle("Brawlhalla SEA 1v1 Queue");
+        builder.setDescription(
+          `Hiển thị những người chơi trong top 1000 SEA đánh rank 1v1 trong ${timeRemove} phút gần đây hiện tại có ${boardQueue.length} người`
+        );
+        console.log(`Người chơi đang rank ${boardQueue.length}`);
+
+        for (var i = 0; i < boardQueue.length; i++) {
+          Debug(`Field ${i}`);
+          var player = boardQueue[i];
+          builder.addFields({
+            name: GetEmojiRank(player.rating) + Truncate(player.name, 13),
+            value: GetPlayerFormat(player),
+            inline: true,
+          });
+          countLimit++;
+          if (countLimit == 18 || i == boardQueue.length - 1) {
+            Debug("Add builders");
+            builder.setTimestamp();
+            Debug("Add builders 1");
+            embeds.push(builder);
+            Debug("Add builder 2");
+            builder = new EmbedBuilder();
+            countLimit = 0;
+          }
         }
       }
-    }
-    try{
-      await UpdateEmbedsQueue(embeds, msg.channel);
-    }
-    catch{}
-      
+      try {
+        await UpdateEmbedsQueue(embeds, msg.channel);
+      } catch {}
 
       console.log("sleeping");
       await Sleep(timeDelay);
