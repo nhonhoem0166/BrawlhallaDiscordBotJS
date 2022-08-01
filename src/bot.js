@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { BrawlAPI } = require("./BrawlAPI");
 const { token, prefix } = process.env;
 const {
   Client,
@@ -29,6 +30,9 @@ for (const folder of functionFolders) {
     require(`./Functions/${folder}/${file}`)(client);
   }
 }
+(async () => {
+  await BrawlAPI.Init();
+})();
 client.commandHandler();
 client.eventHandler();
 client.login(token);

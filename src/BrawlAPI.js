@@ -4,6 +4,14 @@ class BrawlAPI {
   static backetList = ["1v1", "2v2"];
   static regionList = ["us-e", "eu", "sea", "brz", "aus", "us-w", "jpn"];
   static dataLegends = [];
+  static async Init() {
+     await this.UpdateStaticData();
+  }
+  static async UpdateStaticData()
+  {
+    this.dataLegends = await this.GetAllLegend();
+    console.log(this.dataLegends);
+  }
   static async GetLeaderBoard(backet, region, page) {
     if (!this.backetList.includes(backet)) {
       console.log(`Backet ${backet} not found`);
@@ -46,6 +54,13 @@ class BrawlAPI {
   }
   static async GetAllLegend() {
     return await this.DownloadData(`legend/all`);
+  }
+  static GetLegendName(legend_id) {
+    if (this.dataLegends.length == 0) {
+      console.log("dataLegend null");
+      return false;
+    }
+    return this.dataLegends.find((x) => x.legend_id == legend_id).bio_name;
   }
   static async GetLegendInfo(legend_id) {
     return await this.DownloadData(`legend/${legend_id}`);
@@ -92,7 +107,6 @@ class BrawlAPI {
     console.log(uri);
     uri += `&api_key=${process.env.BrawlAPIKey}`;
     var uriFormat = `https://api.brawlhalla.com/${uri}`;
-    
 
     try {
       //auto parse json to object

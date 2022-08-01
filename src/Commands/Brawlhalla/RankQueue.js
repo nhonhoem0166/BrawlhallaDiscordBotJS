@@ -78,11 +78,12 @@ function GetPlayerFormat(player) {
     ).toFixed(1)}%*)`
   );
 
-  //stringBuiler.push(`Best legend: **${player.bestLegend.name}**`);
   stringBuiler.push(
-    `Cập nhật **${GetMinuteBySubDate(
-      new Date(),
-      player.lastUpdate
+    `Best legend: **${BrawlAPI.GetLegendName(player.best_legend)}**`
+  );
+  stringBuiler.push(
+    `Cập nhật **${GetMinuteBySubDate(new Date(), player.lastUpdate).toFixed(
+      0
     )} phút trước**`
   );
   return stringBuiler.join("\n");
@@ -93,7 +94,7 @@ async function UpdateEmbedsQueue(queueEmbeds, channel) {
     console.log(`Builders index ${i}`);
     console.log(`messageBoardRanks.Count = ${messageBoardRanks.length}`);
     if (i < messageBoardRanks.length) {
-      await messageBoardRanks[i].edit({ embeds: queueEmbeds[i] });
+      await messageBoardRanks[i].edit({ embeds: [queueEmbeds[i]] });
     } else {
       var message = await channel.send({ embeds: [queueEmbeds[i]] });
       messageBoardRanks.push(message);
@@ -130,7 +131,7 @@ module.exports = {
       for (var page = 1; page <= maxPage; page++) {
         console.log(`update board page ${page}`);
         var dataArr = await BrawlAPI.GetLeaderBoard("1v1", "sea", page);
-        console.log(dataArr);
+        //console.log(dataArr);
         console.log(`update board page ${page} ${dataArr ? "done" : "fail"}`);
         if (!dataArr) {
           continue;
@@ -149,13 +150,12 @@ module.exports = {
           newPlayer.lastUpdate = new Date();
           //fix check
           var oldPlayerIndex = false;
-          if(boardQueue.length > 0)
-          {
+          if (boardQueue.length > 0) {
             oldPlayerIndex = boardQueue.find(
               (x) => x.brawlhalla_id == newPlayer.brawlhalla_id
             );
           }
-          
+
           if (oldPlayerIndex) {
             boardQueue[oldPlayerIndex] = newPlayer;
           } else {
