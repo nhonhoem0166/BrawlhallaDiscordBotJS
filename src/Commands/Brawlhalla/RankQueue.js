@@ -89,17 +89,17 @@ function GetPlayerFormat(player) {
   return stringBuiler.join("\n");
 }
 async function UpdateEmbedsQueue(queueEmbeds, channel) {
-  console.log(`builders.Count = ${queueEmbeds.length}`);
+  Debug(`builders.Count = ${queueEmbeds.length}`);
   for (var i = 0; i < queueEmbeds.length; i++) {
-    console.log(`Builders index ${i}`);
-    console.log(`messageBoardRanks.Count = ${messageBoardRanks.length}`);
+    Debug(`Builders index ${i}`);
+    Debug(`messageBoardRanks.Count = ${messageBoardRanks.length}`);
     if (i < messageBoardRanks.length) {
       await messageBoardRanks[i].edit({ embeds: [queueEmbeds[i]] });
     } else {
       var message = await channel.send({ embeds: [queueEmbeds[i]] });
       messageBoardRanks.push(message);
     }
-    console.log(`Builders ${i} done`);
+    Debug(`Builders ${i} done`);
     if (i == queueEmbeds.length - 1) {
       i++;
       for (; i < messageBoardRanks.length; i++) {
@@ -110,6 +110,11 @@ async function UpdateEmbedsQueue(queueEmbeds, channel) {
         messageBoardRanks.splice(i, 1);
       }
     }
+  }
+}
+function Debug(msg) {
+  if (process.env.debug) {
+    Debug(`Rank Queue${msg}`);
   }
 }
 module.exports = {
@@ -129,10 +134,10 @@ module.exports = {
       var updateRank = [];
       //update queue board
       for (var page = 1; page <= maxPage; page++) {
-        console.log(`update board page ${page}`);
+        Debug(`update board page ${page}`);
         var dataArr = await BrawlAPI.GetLeaderBoard("1v1", "sea", page);
-        //console.log(dataArr);
-        console.log(`update board page ${page} ${dataArr ? "done" : "fail"}`);
+        //Debug(dataArr);
+        Debug(`update board page ${page} ${dataArr ? "done" : "fail"}`);
         if (!dataArr) {
           continue;
         }
@@ -145,7 +150,7 @@ module.exports = {
       oldRank = updateRank;
 
       if (newQueueList.length > 0) {
-        console.log("Đang xử lý dữ liệu");
+        Debug("Đang xử lý dữ liệu");
         for (const newPlayer of newQueueList) {
           newPlayer.lastUpdate = new Date();
           //fix check
@@ -163,45 +168,46 @@ module.exports = {
           }
         }
       }
-        boardQueue.filter(
-          (x) => GetMinuteBySubDate(new Date(), x.lastUpdate).toFixed(0) < timeRemove
-        );
-        boardQueue.sort((a, b) => {
-          return a - b;
+      boardQueue = boardQueue.filter(
+        (x) =>
+          GetMinuteBySubDate(new Date(), x.lastUpdate).toFixed(0) < timeRemove
+      );
+      boardQueue = boardQueue.sort((a, b) => {
+        return a.rank - b.rank;
+      });
+      Debug("Đang thêm thông tin người chơi vào Board");
+
+      var countLimit = 0;
+      var embeds = [];
+
+      var builder = new EmbedBuilder();
+      builder.setTitle("Brawlhalla SEA 1v1 Queue");
+      builder.setDescription(
+        `Hiển thị những người chơi trong top 1000 SEA đánh rank 1v1 trong ${timeRemove} phút gần đây hiện tại có ${boardQueue.length} người`
+      );
+      console.log(`Người chơi đang rank ${boardQueue.length}`);
+
+      for (var i = 0; i < boardQueue.length; i++) {
+        Debug(`Field ${i}`);
+        var player = boardQueue[i];
+        builder.addFields({
+          name: GetEmojiRank(player.rating) + Truncate(player.name, 13),
+          value: GetPlayerFormat(player),
+          inline: true,
         });
-        console.log("Đang thêm thông tin người chơi vào Board");
-
-        var countLimit = 0;
-        var embeds = [];
-
-        var builder = new EmbedBuilder();
-        builder.setTitle("Brawlhalla SEA 1v1 Queue");
-        builder.setDescription(
-          `Hiển thị những người chơi trong top 1000 SEA đánh rank 1v1 trong ${timeRemove} phút gần đây hiện tại có ${boardQueue.length} người`
-        );
-        console.log(`Người chơi đang rank ${boardQueue.length}`);
-
-        for (var i = 0; i < boardQueue.length; i++) {
-          console.log(`Field ${i}`);
-          var player = boardQueue[i];
-          builder.addFields({
-            name: GetEmojiRank(player.rating) + Truncate(player.name, 13),
-            value: GetPlayerFormat(player),
-            inline: true,
-          });
-          countLimit++;
-          if (countLimit == 18 || i == boardQueue.length - 1) {
-            console.log("Add builders");
-            builder.setTimestamp();
-            console.log("Add builders 1");
-            embeds.push(builder);
-            console.log("Add builder 2");
-            builder = new EmbedBuilder();
-            countLimit = 0;
-          }
+        countLimit++;
+        if (countLimit == 18 || i == boardQueue.length - 1) {
+          Debug("Add builders");
+          builder.setTimestamp();
+          Debug("Add builders 1");
+          embeds.push(builder);
+          Debug("Add builder 2");
+          builder = new EmbedBuilder();
+          countLimit = 0;
         }
-        await UpdateEmbedsQueue(embeds, msg.channel);
-      
+      }
+      await UpdateEmbedsQueue(embeds, msg.channel);
+
       console.log("sleeping");
       await Sleep(timeDelay);
     }
