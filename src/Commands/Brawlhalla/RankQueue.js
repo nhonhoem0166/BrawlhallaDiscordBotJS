@@ -1,6 +1,6 @@
 const { BrawlAPI } = require("../../BrawlAPI.js");
 const { EmbedBuilder } = require("discord.js");
-require("../../Utility.js");
+const Utility = require("../../Utility.js");
 var boardQueue = [];
 var messageBoardRanks = [];
 var timeDelay = 4 * (60 * 1000);
