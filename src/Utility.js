@@ -6,7 +6,7 @@ class Utility {
       const response = await axios.get(url, {
         transformResponse: (data) => {
           try{
-            return decodeURIComponent(this.Escape(data));
+            data = decodeURIComponent(this.Escape(data));
           }
           catch{}
           return JSON.parse(data);
