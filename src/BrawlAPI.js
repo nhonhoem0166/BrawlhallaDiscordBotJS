@@ -37,7 +37,7 @@ class BrawlAPI {
     if (dataArr || !dataArr[0]) return false;
     dataArr.filter(
       (p) =>
-        decodeURIComponent(escape(p.name)).toLowerCase() == name.toLowerCase()
+        p.name.toLowerCase() == name.toLowerCase()
     );
     return dataArr[0].brawlhalla_id;
   }
@@ -109,7 +109,7 @@ class BrawlAPI {
     console.log(uri);
     uri += `&api_key=${process.env.BrawlAPIKey}`;
     var urlFormat = `https://api.brawlhalla.com/${uri}`;
-   return Utility.DownloadData(urlFormat);
+   return await Utility.DownloadData(urlFormat);
   }
 }
 module.exports = {
