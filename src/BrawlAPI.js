@@ -1,4 +1,7 @@
-const axios = require("axios");
+const { Utils } = require("discord.js");
+const Utility = require("./Utility");
+
+require("./Utility");
 require("dotenv").config();
 class BrawlAPI {
   static backetList = ["1v1", "2v2"];
@@ -60,10 +63,6 @@ class BrawlAPI {
     return await this.DownloadData(`legend/all`);
   }
   static GetLegendName(legend_id) {
-    if (this.dataLegends.length == 0) {
-      console.log("dataLegend null");
-      return false;
-    }
     return this.dataLegends.find((x) => x.legend_id == legend_id).bio_name;
   }
   static async GetLegendInfo(legend_id) {
@@ -110,23 +109,7 @@ class BrawlAPI {
     console.log(uri);
     uri += `&api_key=${process.env.BrawlAPIKey}`;
     var urlFormat = `https://api.brawlhalla.com/${uri}`;
-
-    try {
-      //auto parse json to object
-      const response = await axios.get(urlFormat, {
-        transformResponse: (data) => {
-          var jsonClean = decodeURIComponent(escape(data));
-          data = JSON.parse(jsonClean);
-          return data;
-        },
-        responseType: "json",
-      });
-
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
+   return Utility.DownloadData(urlFormat);
   }
 }
 module.exports = {

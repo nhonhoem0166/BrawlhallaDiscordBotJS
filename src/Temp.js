@@ -1,26 +1,12 @@
-require("dotenv").config();
-const { token, prefix } = process.env;
-const {
-  Client,
-  IntentsBitField,
-  Collection,
-  GatewayIntentBits,
-} = require("discord.js");
-const fs = require("fs");
-const { CLIENT_RENEG_LIMIT } = require("tls");
-const messageCreate = require("./Events/client/messageCreate");
+const Utility = require("./Utility");
+const fs = require('fs');
 
-const client = new Client({
-  intents: [
-    IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.MessageContent,
-    IntentsBitField.Flags.GuildMessages,
-    IntentsBitField.Flags.DirectMessages,
-  ],
+fs.readFile('testData.txt', 'utf8', (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  //console.log();
+  var escape = data.replaceAll("\\u00","%");
+  console.log(decodeURIComponent(escape));
 });
-client.on("messageCreate",async (msg)=>{
-  if(msg.author.id != process.env.admin) return;
-  await msg.delete();
-  msg.edit({embeds})
-
-})

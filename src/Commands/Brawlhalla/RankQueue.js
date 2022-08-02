@@ -1,6 +1,6 @@
 const { BrawlAPI } = require("../../BrawlAPI.js");
 const { EmbedBuilder } = require("discord.js");
-
+require("../../Utility.js");
 var boardQueue = [];
 var messageBoardRanks = [];
 var timeDelay = 4 * (60 * 1000);
@@ -30,11 +30,6 @@ async function GetQueue(oldRank, updateRank) {
     }
   }
   return queueList;
-}
-function Truncate(value, maxChars) {
-  return value.length <= maxChars
-    ? value
-    : value.substring(0, maxChars) + "...";
 }
 function GetEmojiRank(elo) {
   if (elo >= 2000) {
@@ -205,7 +200,7 @@ module.exports = {
             (player.ratingChange == 0
               ? "🟢"
               : `*${player.ratingChange < 0 ? `🔴` : `🟢`}*`) +
-            Truncate(player.name, 13),
+             Utility.Truncate(player.name, 13),
           value: GetPlayerFormat(player),
           inline: true,
         });
