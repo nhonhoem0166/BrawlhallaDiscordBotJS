@@ -5,7 +5,11 @@ class Utility {
       //auto parse json to object
       const response = await axios.get(url, {
         transformResponse: (data) => {
-          return JSON.parse(decodeURIComponent(this.Escape(data)));
+          try{
+            return decodeURIComponent(this.Escape(data));
+          }
+          catch{}
+          return JSON.parse(data);
         },
         responseType: "json",
       });
