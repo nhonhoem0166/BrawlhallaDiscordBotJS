@@ -5,7 +5,7 @@ class Utility {
       //auto parse json to object
       const response = await axios.get(url, {
         transformResponse: (data) => {
-          return decodeURIComponent(this.Escape(data));
+          return JSON.parse(decodeURIComponent(this.Escape(data)));
         },
         responseType: "json",
       });
@@ -17,7 +17,7 @@ class Utility {
     }
   }
   static Escape(str) {
-    return str.replaceAll("\\u00","%");
+    return str.replaceAll("\\u00", "%");
   }
   static Truncate(value, maxChars) {
     return value.length <= maxChars
