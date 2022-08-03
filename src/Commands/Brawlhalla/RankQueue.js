@@ -162,7 +162,7 @@ module.exports = {
       for (let index = 0; index < boardQueue.length; index++) {
         const player = boardQueue[index];
         if (
-          GetMinuteBySubDate(new Date(), player.lastUpdate).toFixed(0) >
+          Utility.GetMinuteBySubDate(new Date(), player.lastUpdate).toFixed(0) >
           timeRemove
         ) {
           boardQueue.splice(index, 1);
@@ -194,7 +194,7 @@ module.exports = {
             (player.ratingChange == 0
               ? "🟢"
               : `*${player.ratingChange < 0 ? `🔴` : `🟢`}*`) +
-             Utility.Truncate(player.name, 13),
+            Utility.Truncate(player.name, 13),
           value: GetPlayerFormat(player),
           inline: true,
         });
