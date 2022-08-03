@@ -3,16 +3,10 @@ const { EmbedBuilder } = require("discord.js");
 const Utility = require("../../Utility.js");
 var boardQueue = [];
 var messageBoardRanks = [];
-var timeDelay = 4 * (60 * 1000);
+var timeDelay = Utility.GetMillisecondFromMinute(4);
 var timeRemove = 30;
 var maxPage = 20;
 
-function GetMinuteBySubDate(firstDate, secondDate) {
-  return Math.abs(firstDate - secondDate) / (1000 * 60);
-}
-function Sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 async function GetQueue(oldRank, updateRank) {
   var queueList = [];
   if (!oldRank || !updateRank) return queueList;
@@ -82,7 +76,7 @@ function GetPlayerFormat(player) {
     `Tướng tủ: **${BrawlAPI.GetLegendName(player.best_legend)}**`
   );
   stringBuiler.push(
-    `Chơi **${GetMinuteBySubDate(new Date(), player.lastUpdate).toFixed(
+    `Chơi **${Utility.GetMinuteBySubDate(new Date(), player.lastUpdate).toFixed(
       0
     )} phút trước**`
   );
@@ -219,7 +213,7 @@ module.exports = {
       await UpdateEmbedsQueue(embeds, msg.channel);
 
       console.log("sleeping");
-      await Sleep(timeDelay);
+      await Utility.SleepSync(timeDelay);
     }
   },
 };

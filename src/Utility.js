@@ -5,10 +5,9 @@ class Utility {
       //auto parse json to object
       const response = await axios.get(url, {
         transformResponse: (data) => {
-          try{
+          try {
             data = decodeURIComponent(this.Escape(data));
-          }
-          catch{}
+          } catch {}
           return JSON.parse(data);
         },
         responseType: "json",
@@ -27,6 +26,17 @@ class Utility {
     return value.length <= maxChars
       ? value
       : value.substring(0, maxChars) + "...";
+  }
+  static GetMinuteBySubDate(firstDate, secondDate) {
+    return Math.abs(firstDate - secondDate) / (1000 * 60);
+  }
+  static SleepSync(ms)
+  {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  static GetMillisecondFromMinute(minute)
+  {
+    return minute * 60 * 1000;
   }
 }
 module.exports = Utility;

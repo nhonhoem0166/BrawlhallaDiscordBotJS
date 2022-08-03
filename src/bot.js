@@ -33,6 +33,7 @@ for (const folder of functionFolders) {
 (async () => {
   await BrawlAPI.Init();
 })();
+
 client.commandHandler();
 client.eventHandler();
 client.login(token);
