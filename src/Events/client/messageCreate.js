@@ -3,11 +3,6 @@ module.exports = {
   name: "messageCreate",
   async execute(msg, client) {
     if (!msg.content.startsWith(process.env.prefix) || msg.author.bot) return;
-    
-    for (let index = 0; index < array.length; index++) {
-      const element = array[index];
-      
-    }
     var cmdString = msg.content.substring(
       process.env.prefix.length,
       msg.content.length
