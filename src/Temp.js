@@ -10,6 +10,7 @@ const DBController = require("./DBController");
 const client = new Client();
 client.on("messageCreate",(msg) =>
 {
+  
   var chatArr = msg.content.split(" ");
   var isnum = /^\d+$/.test(chatArr[0]);
   if(!chatArr[0] || !isnum)
@@ -20,6 +21,6 @@ client.on("messageCreate",(msg) =>
   }
   var id = chatArr[0];
   await msg.reply("Đang xử lý thông tin người chơi")
-  var msg = await DBController.AddDiscordLink(id,msg.author.id);
+  var msg = await DBController.AddLink(id,msg.author.id);
 
 })

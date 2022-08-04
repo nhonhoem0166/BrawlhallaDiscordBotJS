@@ -3,6 +3,7 @@ const Utility = require("../../Utility.js");
 
 module.exports = {
   data: {
+    alias:["test"],
     name: "t",
     admin: true,
   },

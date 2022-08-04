@@ -5,46 +5,53 @@ require("dotenv").config();
 
 const client = new MongoClient(process.env.DBConnect);
 const discordDB = client.db("DiscordBot");
-const colLinkAccout = discordDB.collection("LinkAccout");
+const colLink = discordDB.collection("Link");
 class DBController {
-  static async AddDiscordLink(brawlID, discordID) {
-    if (brawlID == 0 || discordID == 0) {
-      return "brawlID = 0";
+  static async GetLinkByDiscordID(discord_id) {
+    return await colLink.findOne({ discord_id, discord_id });
+  }
+  static async AddLink(brawlhalla_id, discord_id) {
+    if (brawlhalla_id == 0 || discord_id == 0) {
+      return "brawlhalla_id = 0";
     }
-    var brawler = await colLinkAccout.findOne({
-      discordID: discordID,
+    var brawler = await colLink.findOne({
+      discord_id: discord_id,
     });
     if (brawler) {
-      return `Tài khoản của bạn đã được liên kết với **Brawlhalla ID:** ${brawler.brawlID} **Tên:** ${brawler.name} **Khu vực:** ${brawler.region} trước đó.\n`;
+      return `Tài khoản của bạn đã được liên kết với **Brawlhalla ID:** ${brawler.brawlhalla_id} **Tên:** ${brawler.name} **Khu vực:** ${brawler.region} trước đó.\n`;
     }
 
-    brawler = await BrawlAPI.GetPlayerRankedByID(brawlID);
+    brawler = await BrawlAPI.GetPlayerRankedByID(brawlhalla_id);
     if (!brawler.rating) {
       return "Không tìm thấy người chơi vui lòng kiểm tra lại ID, nếu chưa chơi trận rank nào mùa này thì hãy chơi 1 trận rồi đợi 5 phút thử lại";
     }
     var doc = {
       name: brawler.name,
       region: brawler.region,
-      elo: Number(brawler.rating),
-      peakElo: Number(brawler.peak_rating),
-      discordID: discordID,
-      brawlID: Number(brawlID),
-      lastUpdate: Number(new Date().getTime()),
+      rating: Number(brawler.rating),
+      peak_rating: Number(brawler.peak_rating),
+      discord_id: discord_id,
+      brawlhalla_id: Number(brawlhalla_id),
+      lastSynced: Number(new Date().getTime()),
     };
-    var result = await colLinkAccout.insertOne(doc);
+    var result = await colLink.insertOne(doc);
     console.log(result);
     if (result)
-      return `<@${discordID}>Tài khoản của bạn đã liên kết thành công với **Brawlhalla ID:** ${brawlID} **Tên:** ${brawler.name} **Khu vực:** ${brawler.region}`;
+      return `<@${discord_id}>Tài khoản của bạn đã liên kết thành công với **Brawlhalla ID:** ${brawlhalla_id} **Tên:** ${brawler.name} **Khu vực:** ${brawler.region}`;
     return "Có lỗi xảy ra @@";
   }
-  static async ReplaceDiscordLink(doc) {
-    if (!doc.brawlID) return false;
-    const filter = { brawlID: doc.brawlID };
-    console.log(`Update Player ${doc.brawlID}`);
-    return await colLinkAccout.replaceOne(filter, doc);
+  static async UpdateLink(discord_id, doc) {
+    if (!discord_id) return false;
+    const filter = { discord_id: discord_id };
+    return await colLink.updateOne(filter, doc);
   }
-  static async DeleteDiscordLink(DiscordID) {
-    var result = await colLinkAccout.deleteOne({ discordID: DiscordID });
+  static async ReplaceLink(discord_id, doc) {
+    if (!discord_id) return false;
+    const filter = { discord_id: discord_id };
+    return await colLink.replaceOne(filter, doc);
+  }
+  static async DeleteLink(discord_id) {
+    var result = await colLink.deleteOne({ discord_id: discord_id });
     if (result.deletedCount > 0) {
       return "Hủy liên kết thành công";
     }
