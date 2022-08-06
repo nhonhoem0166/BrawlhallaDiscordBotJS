@@ -112,113 +112,116 @@ function Debug(msg) {
     Debug(`Rank Queue${msg}`);
   }
 }
+async function RankQueue(channel_id) {
+  var oldRank = [];
+
+  while (true) {
+    try {
+      var updateRank = [];
+      //update queue board
+      for (var page = 1; page <= maxPage; page++) {
+        Debug(`update board page ${page}`);
+        var dataArr = await BrawlAPI.GetLeaderBoard("1v1", "sea", page);
+        //Debug(dataArr);
+        Debug(`update board page ${page} ${dataArr ? "done" : "fail"}`);
+        if (!dataArr) {
+          continue;
+        }
+        updateRank = updateRank.concat(dataArr);
+      }
+      console.log("updateRank cout: " + updateRank.length);
+      //clear dupes
+      updateRank = [...new Set(updateRank)];
+      var newQueueList = await GetQueue(oldRank, updateRank);
+      oldRank = updateRank;
+      Debug("Đang xử lý dữ liệu");
+      for (const newPlayer of newQueueList) {
+        newPlayer.lastUpdate = new Date();
+        //fix check
+        var oldPlayerIndex = false;
+        if (boardQueue.length > 0) {
+          oldPlayerIndex = boardQueue.find(
+            (x) => x.brawlhalla_id == newPlayer.brawlhalla_id
+          );
+        }
+
+        if (oldPlayerIndex) {
+          boardQueue[oldPlayerIndex] = newPlayer;
+        } else {
+          boardQueue.push(newPlayer);
+        }
+      }
+      //clear player long time
+      for (let index = 0; index < boardQueue.length; index++) {
+        const player = boardQueue[index];
+        if (
+          Utility.GetMinuteBySubDate(new Date(), player.lastUpdate).toFixed(0) >
+          timeRemove
+        ) {
+          boardQueue.splice(index, 1);
+          index--;
+        }
+      }
+
+      this.boardQueue = boardQueue.sort((a, b) => {
+        return a.rank - b.rank;
+      });
+      Debug("Đang thêm thông tin người chơi vào Board");
+
+      var countLimit = 0;
+      var embeds = [];
+
+      var builder = new EmbedBuilder();
+      builder.setTitle("Brawlhalla SEA 1v1 Queue");
+      builder.setDescription(
+        `Hiển thị những người chơi trong top 1000 SEA đánh rank 1v1 trong ${timeRemove} phút gần đây hiện tại có ${boardQueue.length} người`
+      );
+      console.log(`Người chơi đang rank ${boardQueue.length}`);
+
+      for (var i = 0; i < boardQueue.length; i++) {
+        Debug(`Field ${i}`);
+        var player = boardQueue[i];
+        builder.addFields({
+          name:
+            GetEmojiRank(player.rating) +
+            (player.ratingChange == 0
+              ? "🟢"
+              : `*${player.ratingChange < 0 ? `🔴` : `🟢`}*`) +
+            Utility.Truncate(player.name, 13),
+          value: GetPlayerFormat(player),
+          inline: true,
+        });
+        countLimit++;
+        if (countLimit == 18 || i == boardQueue.length - 1) {
+          Debug("Add builders");
+          builder.setTimestamp();
+          Debug("Add builders 1");
+          embeds.push(builder);
+          Debug("Add builder 2");
+          builder = new EmbedBuilder();
+          countLimit = 0;
+        }
+      }
+
+      await UpdateEmbedsQueue(embeds, channel_id);
+
+      console.log("sleeping");
+      await Utility.SleepSync(timeDelay);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
 module.exports = {
   data: {
     name: "rankqueue",
     admin: true,
   },
+  RankQueue: RankQueue,
   async execute(msg, client) {
     if (msg.author.id != process.env.admin) return;
     await msg.delete();
-
-    var oldRank = [];
-
-    while (true) {
-      try {
-        var updateRank = [];
-        //update queue board
-        for (var page = 1; page <= maxPage; page++) {
-          Debug(`update board page ${page}`);
-          var dataArr = await BrawlAPI.GetLeaderBoard("1v1", "sea", page);
-          //Debug(dataArr);
-          Debug(`update board page ${page} ${dataArr ? "done" : "fail"}`);
-          if (!dataArr) {
-            continue;
-          }
-          updateRank = updateRank.concat(dataArr);
-        }
-        console.log("updateRank cout: " + updateRank.length);
-        //clear dupes
-        updateRank = [...new Set(updateRank)];
-        var newQueueList = await GetQueue(oldRank, updateRank);
-        oldRank = updateRank;
-        Debug("Đang xử lý dữ liệu");
-        for (const newPlayer of newQueueList) {
-          newPlayer.lastUpdate = new Date();
-          //fix check
-          var oldPlayerIndex = false;
-          if (boardQueue.length > 0) {
-            oldPlayerIndex = boardQueue.find(
-              (x) => x.brawlhalla_id == newPlayer.brawlhalla_id
-            );
-          }
-
-          if (oldPlayerIndex) {
-            boardQueue[oldPlayerIndex] = newPlayer;
-          } else {
-            boardQueue.push(newPlayer);
-          }
-        }
-        //clear player long time
-        for (let index = 0; index < boardQueue.length; index++) {
-          const player = boardQueue[index];
-          if (
-            Utility.GetMinuteBySubDate(new Date(), player.lastUpdate).toFixed(
-              0
-            ) > timeRemove
-          ) {
-            boardQueue.splice(index, 1);
-            index--;
-          }
-        }
-
-        this.boardQueue = boardQueue.sort((a, b) => {
-          return a.rank - b.rank;
-        });
-        Debug("Đang thêm thông tin người chơi vào Board");
-
-        var countLimit = 0;
-        var embeds = [];
-
-        var builder = new EmbedBuilder();
-        builder.setTitle("Brawlhalla SEA 1v1 Queue");
-        builder.setDescription(
-          `Hiển thị những người chơi trong top 1000 SEA đánh rank 1v1 trong ${timeRemove} phút gần đây hiện tại có ${boardQueue.length} người`
-        );
-        console.log(`Người chơi đang rank ${boardQueue.length}`);
-
-        for (var i = 0; i < boardQueue.length; i++) {
-          Debug(`Field ${i}`);
-          var player = boardQueue[i];
-          builder.addFields({
-            name:
-              GetEmojiRank(player.rating) +
-              (player.ratingChange == 0
-                ? "🟢"
-                : `*${player.ratingChange < 0 ? `🔴` : `🟢`}*`) +
-              Utility.Truncate(player.name, 13),
-            value: GetPlayerFormat(player),
-            inline: true,
-          });
-          countLimit++;
-          if (countLimit == 18 || i == boardQueue.length - 1) {
-            Debug("Add builders");
-            builder.setTimestamp();
-            Debug("Add builders 1");
-            embeds.push(builder);
-            Debug("Add builder 2");
-            builder = new EmbedBuilder();
-            countLimit = 0;
-          }
-        }
-
-        await UpdateEmbedsQueue(embeds, msg.channel);
-
-        console.log("sleeping");
-        await Utility.SleepSync(timeDelay);
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    await RankQueue(msg.channel_id);
   },
 };

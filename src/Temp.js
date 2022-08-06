@@ -10,7 +10,7 @@ const DBController = require("./DBController");
 const client = new Client();
 client.on("messageCreate",(msg) =>
 {
-  
+
   var chatArr = msg.content.split(" ");
   var isnum = /^\d+$/.test(chatArr[0]);
   if(!chatArr[0] || !isnum)
